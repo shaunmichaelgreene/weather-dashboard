@@ -1,9 +1,10 @@
 :root {
     --primary: #ccdad1;
-    --secondary: #9caea9;
+    --secondary: #ffffff;
     --tertiary: #788585;
-    --light-dark: #6f6866;
-    --dark: #38302e;
+    --light-dark: #aaa6a6;
+    --dark: #092164;
+    --gradient-dark: #7cb3e7;
     --border-radius: .3rem;
   }
   
@@ -12,7 +13,7 @@
   }
   
   body {
-    background-color: var(--primary);
+    background-color: var(--secondary);
     margin: 0;
     padding: 0;
     font-family: "IBM Plex Sans", sans-serif;
@@ -50,7 +51,7 @@
     display: block;
     margin: 5px 0;
     border-radius: var(--border-radius);
-    color: var(--primary);
+    color: var(--dark);
     border: none;
     outline: none;
     background-color: var(--light-dark);
@@ -59,8 +60,8 @@
   }
   
    .btn:hover {
-    color: var(--primary);
-    background-color: var(--tertiary);
+    /* color: var(--primary); */
+    background-color: var(--gradient-dark);
     transform: translate(0, 0);
     box-shadow: 2px 2px var(--dark);
   }
@@ -94,8 +95,8 @@
   
   .hero {
     padding: 3% 4%;
-    background-color: var(--dark);
-    color: var(--primary);
+    background: linear-gradient(to right, var(--gradient-dark), var(--dark));
+    color: var(--secondary);
   }
   
   .hero p {
@@ -104,7 +105,7 @@
   
   .app-title {
     font-size: 3rem;
-    background-color: var(--primary);
+    background-color: var(--secondary);
     color: var(--dark);
     padding: 0 10px;
     display: inline-block;
@@ -153,7 +154,7 @@
   }
   
   .card-header {
-    color: var(--primary);
+    color: var(--secondary);
     background-color: var(--dark);
     padding: 2.5%;
     border-radius: calc(.18rem - 1px) calc(.18rem - 1px) 0 0;
