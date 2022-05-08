@@ -19,7 +19,7 @@ var formSubmitHandler = function(event) {
         console.log("A search has been initialized for the city of: " + cityInput);
         cityInputEl.value = ""; //reset input form
         var cityArr = cityInput.split(","); //split input text by comma to separate city name and state abbreviation
-        console.log(cityArr);
+        // console.log(cityArr);
         var cityName = cityArr[0].trim( ); //set cityName as the first string item in the array
         if (cityName) { //check to verify variable is valid
             console.log(cityName);
@@ -42,7 +42,7 @@ var formSubmitHandler = function(event) {
         }
         if (found = true) { //if invalid, trigger user alert to re-enter
             //now have cityName and stateID separated, ready to obtain coordinates and fetch weatherAPI
-            console.log(cityName + ", " + stateId);
+            // console.log(cityName + ", " + stateId);
             getCoordinates(cityName, stateId);
         } else {
             alert("Please re-enter your search term in City, ST format (Ex:'Phoenix, AZ'");
@@ -66,11 +66,16 @@ var getCoordinates = function(cityName, stateId) {
     fetch(apiUrl)
         .then(function(response) {
             if (response.ok) {
-                console.log(response);
+                // console.log(response);
                 response.json().then(function(data) {
-                    console.log(data);
-                    console.log("The coordinates of " + cityName + ", " + stateId + " are Latitude: " + data[0].lat + ", Longitude: " + data[0].lon);
+                    // console.log(data);
+                    var cityLat = data[0].lat;
+                    var cityLon = data[0].lon;
+                    console.log("The coordinates of " + cityName + ", " + stateId + " are Latitude: " + cityLat + ", Longitude: " + cityLon);
+                    getWeather(cityLat, cityLon);
                 });
+
+                //define variables and pass to get weather function, then close branch
             } else {
                 alert("Error: " + response.statusText);
             };
@@ -79,7 +84,7 @@ var getCoordinates = function(cityName, stateId) {
             alert("Unable to connect to weather server!");
         });        
 };
-var getCityDetails = function(city) {
+var getWeather = function(cityLat, cityLon) {
     var apiKey = "769cf24c651333f06b49474b8dc504e4";
     console.log(apiKey);
     var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLon + "&exclude=minutely,hourly,daily,alerts&appid=" + apiKey;
