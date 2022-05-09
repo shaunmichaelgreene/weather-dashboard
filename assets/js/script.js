@@ -18,6 +18,7 @@ var uviEl = document.querySelector("#current-uvi");
 var uvIconEl = document.querySelector("#current-uv-icon");
 var tempEl = document.querySelector("#current-temperature");
 var windEl = document.querySelector("#current-windspeed");
+var unixDateArray = [];
 
 var formSubmitHandler = function(event) {
     event.preventDefault();
@@ -66,7 +67,7 @@ var formSubmitHandler = function(event) {
 
 var getCoordinates = function(cityName, stateId) {   
     var apiKey = "769cf24c651333f06b49474b8dc504e4";
-    var apiUrl = "http://api.openweathermap.org/geo/1.0/direct?q=" + cityName + "," + stateId + ",USA&appid=" + apiKey;
+    var apiUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + cityName + "," + stateId + ",USA&appid=" + apiKey;
 
     // var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "," + stateId + "&appid=" + apiKey; //this is the call for city/state/county search
     
@@ -82,6 +83,7 @@ var getCoordinates = function(cityName, stateId) {
                     var formattedCityName = (cityName.charAt(0).toUpperCase() + cityName.substr(1).toLowerCase());
                     citySearchTerm.textContent = formattedCityName + ", " + stateId
                     getWeather(cityLat, cityLon);
+                    getForecast(cityLat, cityLon)
                 });
 
                 //define variables and pass to get weather function, then close branch
@@ -102,7 +104,7 @@ var getWeather = function(cityLat, cityLon) {
             if(response.ok) {
                 console.log(response);
                 response.json().then(function(data) {
-                    console.log(data);
+                    // console.log(data);
                     displayCurrentWeather(data);
                 });                
             } else {
@@ -115,7 +117,7 @@ var getWeather = function(cityLat, cityLon) {
 }
 
 var displayCurrentWeather = function(data) {
-    console.log(data.current);
+    // console.log(data.current);
     var currentWeather = {
         icon: data.current.weather[0].icon,
         humidity: data.current.humidity,
@@ -123,7 +125,7 @@ var displayCurrentWeather = function(data) {
         temperature: data.current.temp,
         windSpeed: data.current.wind_speed
     }
-    console.log(currentWeather);
+    // console.log(currentWeather);
 
     // weatherData.textContent = data.current.weather[0].description;
     iconEl.textContent = data.current.weather[0].description + " ";
@@ -133,7 +135,6 @@ var displayCurrentWeather = function(data) {
     humidityEl.textContent = currentWeather.humidity + "%";
     // uviEl.textContent = "UV Index: "; 
     uvIconEl.textContent = currentWeather.uvIndex;
-    console.log(currentWeather.uvIndex);
     tempEl.textContent = currentWeather.temperature + "ºF";
     windEl.textContent = currentWeather.windSpeed + "MPH";
     
@@ -144,7 +145,69 @@ var displayCurrentWeather = function(data) {
     } else if (currentWeather.uvIndex >= 6) {
         uvIconEl.classList = "bg-danger text-white rounded";
     }
+    
 }
 
+var getForecast = function(cityLat, cityLon) {
+    var apiKey = "769cf24c651333f06b49474b8dc504e4";
+    var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLon + "&exclude=minutely,hourly,alerts&units=imperial&appid=" + apiKey;
+    
+    fetch(apiUrl)
+        .then(function(response) {
+            if(response.ok) {
+                console.log(response);
+                response.json().then(function(data) {
+                    console.log(data);
+                    displayForecast(data);
+
+                });                
+            } else {
+                alert("Error: " + response.statusText);
+            };
+        })
+        .catch(function(error) {
+            alert("Unable to connect to weather server!");
+        });
+};
+
+var displayForecast = function(data) {
+    var forecastObject = {
+        // unixDateArr: [],
+        formattedDateArr: [],
+        iconArr: [],
+        tempArr: [],
+        windArr: [],
+        humidityArr: []
+    };
+
+    for (var i=0; i < 5; i++) {
+        // forecastObject.unixDateArr.push(data.daily[i].dt);
+        unixDateArray.push(data.daily[i].dt);
+        forecastObject.iconArr.push(data.daily[i].weather[0].icon);
+        forecastObject.tempArr.push(data.daily[i].temp.day);
+        forecastObject.windArr.push(data.daily[i].wind_speed);
+        forecastObject.humidityArr.push(data.daily[i].humidity);
+        //add .each function to convert and append dates?
+    }
+    console.log(forecastObject);
+    // console.log(unixDateArray);
+
+    // unixDateArray = forecastObject.unixDateArr;
+    forecastObject.formattedDateArr = dateConverter(unixDateArray);
+    console.log(forecastObject);
+    //now to append everything to the page
+};
+
+var dateConverter = function (formattedDateArr) {
+    console.log(unixDateArray); //why is this now undefined?
+    for (i=0; i < 5; i++) {
+        var toMilliseconds = parseInt(unixDateArray[i]) * 1000;
+        var dateObject = new Date (toMilliseconds);
+        var formattedDate = dateObject.toLocaleString('en-us')
+        formattedDateArr.push(formattedDate);
+    }
+    console.log(formattedDateArr);
+    return
+};
 
 searchFormEl.addEventListener("submit", formSubmitHandler);
