@@ -502,15 +502,10 @@
     }
   }
   
-  .mild {
-    color: green;
+  #current-uv-icon {
+    padding: 0 5px;
   }
 
-  .moderate {
-    color: yellow;
+  .subtitle {
+    padding: 10px;
   }
-  
-  .severe {
-    color: red;
-  }
-  

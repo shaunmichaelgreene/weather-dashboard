@@ -11,6 +11,13 @@ var citySearchTerm = document.querySelector("#city-search-term");
 var cityButtonsEl = document.querySelector("#city-buttons");
 var stateArr = ['AK', 'AL', 'AR', 'AS', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'GU', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN', 'MO', 'MP', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UM', 'UT', 'VA', 'VI', 'VT', 'WA', 'WI', 'WV', 'WY'];
 var foundState = false;
+var weatherData = document.querySelector("#weather-list");
+var iconEl = document.querySelector("#current-icon");
+var humidityEl = document.querySelector("#current-humidity");
+var uviEl = document.querySelector("#current-uvi");
+var uvIconEl = document.querySelector("#current-uv-icon");
+var tempEl = document.querySelector("#current-temperature");
+var windEl = document.querySelector("#current-windspeed");
 
 var formSubmitHandler = function(event) {
     event.preventDefault();
@@ -72,6 +79,8 @@ var getCoordinates = function(cityName, stateId) {
                     var cityLat = data[0].lat;
                     var cityLon = data[0].lon;
                     console.log("The coordinates of " + cityName + ", " + stateId + " are Latitude: " + cityLat + ", Longitude: " + cityLon);
+                    var formattedCityName = (cityName.charAt(0).toUpperCase() + cityName.substr(1).toLowerCase());
+                    citySearchTerm.textContent = formattedCityName + ", " + stateId
                     getWeather(cityLat, cityLon);
                 });
 
@@ -86,8 +95,7 @@ var getCoordinates = function(cityName, stateId) {
 };
 var getWeather = function(cityLat, cityLon) {
     var apiKey = "769cf24c651333f06b49474b8dc504e4";
-    console.log(apiKey);
-    var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLon + "&exclude=minutely,hourly,daily,alerts&appid=" + apiKey;
+    var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLon + "&exclude=minutely,hourly,daily,alerts&units=imperial&appid=" + apiKey;
     
     fetch(apiUrl)
         .then(function(response) {
@@ -95,7 +103,7 @@ var getWeather = function(cityLat, cityLon) {
                 console.log(response);
                 response.json().then(function(data) {
                     console.log(data);
-                    //displayCurrentWeather(data);
+                    displayCurrentWeather(data);
                 });                
             } else {
                 alert("Error: " + response.statusText);
@@ -106,6 +114,37 @@ var getWeather = function(cityLat, cityLon) {
         });
 }
 
+var displayCurrentWeather = function(data) {
+    console.log(data.current);
+    var currentWeather = {
+        icon: data.current.weather[0].icon,
+        humidity: data.current.humidity,
+        uvIndex: data.current.uvi,
+        temperature: data.current.temp,
+        windSpeed: data.current.wind_speed
+    }
+    console.log(currentWeather);
+
+    // weatherData.textContent = data.current.weather[0].description;
+    iconEl.textContent = data.current.weather[0].description + " ";
+    var conditionsIcon = document.createElement("img");
+    conditionsIcon.setAttribute("src", "https://openweathermap.org/img/wn/" + currentWeather.icon + "@2x.png");
+    citySearchTerm.appendChild(conditionsIcon);
+    humidityEl.textContent = currentWeather.humidity + "%";
+    // uviEl.textContent = "UV Index: "; 
+    uvIconEl.textContent = currentWeather.uvIndex;
+    console.log(currentWeather.uvIndex);
+    tempEl.textContent = currentWeather.temperature + "ºF";
+    windEl.textContent = currentWeather.windSpeed + "MPH";
+    
+    if (currentWeather.uvIndex < 3) {
+        uvIconEl.classList = "bg-success text-white rounded";
+    } else if (currentWeather.uvIndex >= 3 && currentWeather.uvIndex < 6) {
+        uvIconEl.classList = "bg-warning text-white rounded";
+    } else if (currentWeather.uvIndex >= 6) {
+        uvIconEl.classList = "bg-danger text-white rounded";
+    }
+}
 
 
 searchFormEl.addEventListener("submit", formSubmitHandler);
