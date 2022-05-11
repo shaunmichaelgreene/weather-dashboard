@@ -1,7 +1,3 @@
-//use weatherOne API - 2 different APIs
-// 1. gets you all of the nitty gritty details
-// 2. gets you lattitude/longitude 
-
 var searchBtn = document.querySelector("#search-btn");
 var searchHistory = [];
 var searchFormEl = document.querySelector("#search-form");
@@ -26,24 +22,20 @@ var formSubmitHandler = function(event) {
     event.preventDefault();
     forecastContainer.textContent="";
     var cityInput = cityInputEl.value.trim( ).toLowerCase();
-    if (cityInput.includes(',')) { //verify that any input was entered
+    if (cityInput.includes(',')) { //verify that any input was entered, and that it includes a comma
         console.log("A search has been initialized for the city of: " + cityInput);
-        cityInputEl.value = ""; //reset input form
+        cityInputEl.value = ""; 
         var cityArr = cityInput.split(","); //split input text by comma to separate city name and state abbreviation
-        // console.log(cityArr);
         var cityName = cityArr[0].trim( ); //set cityName as the first string item in the array
         if (cityName) { //check to verify variable is valid
-            console.log(cityName);
         } else { //if input invalid, (ex: ", AZ" trigger user alert to re-enter)
             alert("Please re-enter your search term in City, ST format (Ex:'Phoenix, AZ'"); 
         }
         var stateId = cityArr[1].trim( );
         if (stateId) { //check to verify variable is valid
-            console.log(stateId);
-        } else { //if input invalid, (ex: ", AZ" trigger user alert to re-enter)
+        } else { //if input invalid, (ex: ", AZ") trigger user alert to re-enter
             alert("Please re-enter your search term in City, ST format (Ex:'Phoenix, AZ'"); 
         }
-        // var stateId = cityArr[1].toUpperCase(); //set stateId to 2nd item in the array and set to uppercase
         for (i = 0; i < stateArr.length; i++) { //loop thru state abbreviation array to ensure the state ID entered is valid
             if (stateId.toUpperCase() == stateArr[i]) {
                 stateId = stateArr[i]; //if valid, confirm the variable and end loop
@@ -52,85 +44,75 @@ var formSubmitHandler = function(event) {
             };
         }
         if (found = true) { //if invalid, trigger user alert to re-enter
-            //now have cityName and stateId separated, ready to obtain coordinates and fetch weatherAPI
-            // console.log(cityName + ", " + stateId);
-            updateSearchHistory(cityName, stateId);
-            getCoordinates(cityName, stateId);
+            updateSearchHistory(cityName, stateId); //pass city/state to search history
+            getCoordinates(cityName, stateId); //pass city/state to function to retrieve coordinates
         } else {
             alert("Please re-enter your search term in City, ST format (Ex:'Phoenix, AZ'");
-            location.reload(); //refresh page
+            location.reload(); 
 
         }
-        //getCityDetails(city);
-        //getCityForecast(city);
     } else {
         alert("Please re-enter your search term in City, ST format (Ex:'Phoenix, AZ'");
-        cityInputEl.value = ""; //reset input form
+        cityInputEl.value = ""; 
     }
 };
 
-var updateSearchHistory = function(cityName, stateId) {
-    var newSearch = {
+var updateSearchHistory = function(cityName, stateId) { //function to add search parameter to localStorage
+    var newSearch = { //create object with city and state name
         city: cityName,
         state: stateId
     };
-    if (Array.isArray(newSearch)) {
-        console.log(newSearch);
-    }
-    searchHistory.push(newSearch);
-    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
-    var searchBtnEl = document.createElement("button");
+    // if (Array.isArray(newSearch)) { 
+    //     console.log(newSearch);
+    // } else {console.log(newSearch + "is not an array!")};
+
+    searchHistory.push(newSearch); 
+    localStorage.setItem("searchHistory", JSON.stringify(searchHistory)); //set search history in localStorage
+    var searchBtnEl = document.createElement("button"); 
     $(searchBtnEl).addClass("btn");
-    searchBtnEl.textContent = (cityName + ", " + stateId);
-    var searchBtnElId = cityName.concat(",",stateId);
-    // searchBtnEl.setAttribute = ("id", "test");
-    searchBtnEl.setAttribute("id", searchBtnElId);
+    searchBtnEl.textContent = (cityName + ", " + stateId); 
+    var searchBtnElId = cityName.concat(",",stateId); //concatenate cityName & stateId with a comman between them
+    searchBtnEl.setAttribute("id", searchBtnElId); 
     // searchBtnEl.setAttribute = ("id", `${searchBtnElId}`);
-    // searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); //need help here, ID not setting
-    cityButtonsEl.appendChild(searchBtnEl);
+    // searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); 
+    cityButtonsEl.appendChild(searchBtnEl); 
 };
-var loadHistory = function() {
-    searchHistory = JSON.parse(localStorage.getItem("searchHistory"));
-    if (!searchHistory) {
-        searchHistory = [];
+var loadHistory = function() { //function to retrieve search history from local storage and add them as buttons to the page
+    searchHistory = JSON.parse(localStorage.getItem("searchHistory")); 
+    if (!searchHistory) { 
+        searchHistory = []; //reset global variable 
     } else {
-        $.each(searchHistory, function (e) {
-            var cityName = $(this).attr("city");
-            var stateId = $(this).attr("state");
-            var searchBtnEl = document.createElement("button");
+        $.each(searchHistory, function (e) { //loop thru local storage and make a new button for each entry
+            var cityName = $(this).attr("city"); //assign city value of the current item to cityName variable
+            var stateId = $(this).attr("state"); //assign state value of current item to stateId variable
+            var searchBtnEl = document.createElement("button"); 
             $(searchBtnEl).addClass("btn");
-            var searchBtnElId = cityName.concat(",",stateId);
-            searchBtnEl.textContent = (cityName + ", " + stateId);
-            searchBtnEl.setAttribute("id", searchBtnElId);
-
+            var searchBtnElId = cityName.concat(",",stateId); //concatenate cityName & stateId with a comman between them
+            searchBtnEl.textContent = (cityName + ", " + stateId); //use the new variables as text content
+            searchBtnEl.setAttribute("id", searchBtnElId); //set unique ID for each button, being the concatenated cityName,ST as a single string (makes for easier searching later)
             // searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); 
-
-
-            cityButtonsEl.appendChild(searchBtnEl);
+            cityButtonsEl.appendChild(searchBtnEl); 
         });
     };
 };
 
-var getCoordinates = function(cityName, stateId) {   
+var getCoordinates = function(cityName, stateId) {  //function to identify the coordinates of the selected search term 
     var apiKey = "769cf24c651333f06b49474b8dc504e4";
-    var apiUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + cityName + "," + stateId + ",USA&appid=" + apiKey;
+    var apiUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + cityName + "," + stateId + ",USA&appid=" + apiKey; //retrieves latitude and longitude of destination
     
     fetch(apiUrl)
         .then(function(response) {
-            if (response.ok) {
-                // console.log(response);
-                response.json().then(function(data) {
+            if (response.ok) { 
+                response.json().then(function(data) { 
                     // console.log(data);
-                    var cityLat = data[0].lat;
-                    var cityLon = data[0].lon;
+                    var cityLat = data[0].lat; 
+                    var cityLon = data[0].lon; 
                     console.log("The coordinates of " + cityName + ", " + stateId + " are Latitude: " + cityLat + ", Longitude: " + cityLon);
-                    var formattedCityName = (cityName.charAt(0).toUpperCase() + cityName.substr(1).toLowerCase());
-                    citySearchTerm.textContent = formattedCityName + ", " + stateId
-                    getWeather(cityLat, cityLon);
-                    getForecast(cityLat, cityLon)
+                    var formattedCityName = (cityName.charAt(0).toUpperCase() + cityName.substr(1).toLowerCase()); //format city name to title case
+                    citySearchTerm.textContent = formattedCityName + ", " + stateId 
+                    getWeather(cityLat, cityLon); //pass coordinates to function to get current weather conditions
+                    getForecast(cityLat, cityLon) //pass coordinates to function to get 5-day forecast
                 });
-
-                //define variables and pass to get weather function, then close branch
             } else {
                 alert("Error: " + response.statusText);
             };
@@ -139,17 +121,15 @@ var getCoordinates = function(cityName, stateId) {
             alert("Unable to connect to weather server!");
         });        
 };
-var getWeather = function(cityLat, cityLon) {
+var getWeather = function(cityLat, cityLon) { //function to use new API to get weather using location latitude and longitude
     var apiKey = "769cf24c651333f06b49474b8dc504e4";
-    var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLon + "&exclude=minutely,hourly,daily,alerts&units=imperial&appid=" + apiKey;
+    var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLon + "&exclude=minutely,hourly,daily,alerts&units=imperial&appid=" + apiKey; //retrieves current weather data
     
     fetch(apiUrl)
         .then(function(response) {
             if(response.ok) {
-                // console.log(response);
-                response.json().then(function(data) {
-                    // console.log(data);
-                    displayCurrentWeather(data);
+                response.json().then(function(data) { 
+                    displayCurrentWeather(data); //pass new data to function to interpret current weather data in meaningful way
                 });                
             } else {
                 alert("Error: " + response.statusText);
@@ -162,27 +142,24 @@ var getWeather = function(cityLat, cityLon) {
 
 var displayCurrentWeather = function(data) {
     // console.log(data.current);
-    var currentWeather = {
+    var currentWeather = { //define new object variable to store the weather data from the response
         icon: data.current.weather[0].icon,
         humidity: data.current.humidity,
         uvIndex: data.current.uvi,
         temperature: data.current.temp,
         windSpeed: data.current.wind_speed
     }
-    // console.log(currentWeather);
-
-    // weatherData.textContent = data.current.weather[0].description;
-    iconEl.textContent = data.current.weather[0].description + " ";
+    //update text content of html elements to display current weather data
+    iconEl.textContent = data.current.weather[0].description + " "; 
     var conditionsIcon = document.createElement("img");
     conditionsIcon.setAttribute("src", "https://openweathermap.org/img/wn/" + currentWeather.icon + "@2x.png");
-    citySearchTerm.appendChild(conditionsIcon);
+    citySearchTerm.appendChild(conditionsIcon); 
     humidityEl.textContent = currentWeather.humidity + "%";
-    // uviEl.textContent = "UV Index: "; 
     uvIconEl.textContent = currentWeather.uvIndex;
     tempEl.textContent = currentWeather.temperature + "ºF";
     windEl.textContent = currentWeather.windSpeed + "MPH";
     
-    if (currentWeather.uvIndex < 3) {
+    if (currentWeather.uvIndex < 3) { //conditional to determine color of UV index icon
         uvIconEl.classList = "bg-success text-white rounded";
     } else if (currentWeather.uvIndex >= 3 && currentWeather.uvIndex < 6) {
         uvIconEl.classList = "bg-warning text-white rounded";
@@ -193,31 +170,30 @@ var displayCurrentWeather = function(data) {
 }
 
 var getForecast = function(cityLat, cityLon) {
-    formattedDateArray = [];
+    formattedDateArray = []; //reset global variable
     var apiKey = "769cf24c651333f06b49474b8dc504e4";
-    var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLon + "&exclude=minutely,hourly,alerts&units=imperial&appid=" + apiKey;
+    var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLon + "&exclude=minutely,hourly,alerts&units=imperial&appid=" + apiKey; //modified api URL to return daily forecast
     
     fetch(apiUrl)
         .then(function(response) {
-            if(response.ok) {
-                // console.log(response);
-                response.json().then(function(data) {
-                    console.log(data);
-                    interpretForecast(data);
+            if(response.ok) { 
+                response.json().then(function(data) { 
+                    // console.log(data);
+                    interpretForecast(data); //pass new data to function to interpret 5-day forecast in meaningful way
 
                 });                
             } else {
                 alert("Error: " + response.statusText);
             };
         })
-        .catch(function(error) {
+        .catch(function(error) { 
             alert("Unable to connect to weather server!");
         });
 };
 
 var interpretForecast = function(data) {
-    unixDateArray = [];
-    var forecastObject = {
+    unixDateArray = []; //reset array to empty
+    var forecastObject = { //create new object of arrays to hold all of the data for all 5 days
         // unixDateArr: [],
         formattedDateArr: [],
         iconArr: [],
@@ -227,46 +203,37 @@ var interpretForecast = function(data) {
     };
 
     for (var i=0; i < 5; i++) {
-        // forecastObject.unixDateArr.push(data.daily[i].dt);
         unixDateArray.push(data.daily[i].dt);
         forecastObject.iconArr.push(data.daily[i].weather[0].icon);
         forecastObject.tempArr.push(data.daily[i].temp.day);
         forecastObject.windArr.push(data.daily[i].wind_speed);
         forecastObject.humidityArr.push(data.daily[i].humidity);
-        //add .each function to convert and append dates?
     }
     console.log(forecastObject);
     // console.log(unixDateArray);
 
     // unixDateArray = forecastObject.unixDateArr;
     dateConverter(unixDateArray);
-    forecastObject.formattedDateArr = formattedDateArray;
+    forecastObject.formattedDateArr = formattedDateArray; //take local data and assign to global variable
     console.log(forecastObject);
-    //now to append everything to the page
-    displayForecast(forecastObject);
+    displayForecast(forecastObject); //pass forecastObject data to display forecast function to append everything to page
 };
 
-var dateConverter = function () {
-    console.log(unixDateArray); //why is this now undefined?
-    for (i=0; i < 5; i++) {
+var dateConverter = function () { //function to convert the date response data from unix to human-readable format
+    for (i=0; i < 5; i++) { 
         var toMilliseconds = parseInt(unixDateArray[i]) * 1000;
         var dateObject = new Date (toMilliseconds);
-        var formattedDate = dateObject.toLocaleString('en-us') //.split(",")[0] here?
-        formattedDateArray.push(formattedDate);
+        var formattedDate = dateObject.toLocaleString('en-us') //convert to standard US format
+        formattedDateArray.push(formattedDate); //add newly formatted date string to formattedDateArray
     }
-    console.log(formattedDateArray);
+    // console.log(formattedDateArray);
     return
 };
 
-var displayForecast = function(forecastObject) {
-    // var dayCard1 = document.createElement("div");
-    // var dayCard2 = document.createElement("div");
-    // var dayCard3 = document.createElement("div");
-    // var dayCard4 = document.createElement("div");
-    // var dayCard5 = document.createElement("div");
-    for (var i=0; i < 5; i++) {
+var displayForecast = function(forecastObject) { //function to dynamically display 5-day forecast on page 
+    for (var i=0; i < 5; i++) {  
         var dayCard = document.createElement("div");
-        dayCard.setAttribute("id", `dayCard${(i+1)}`);
+        dayCard.setAttribute("id", `dayCard${(i+1)}`); //assign each div a unique id with interpolation
         dayCard.classList = ("card forecast");
         forecastContainer.appendChild(dayCard);
         var dayDateEl = document.createElement("p");
@@ -279,41 +246,37 @@ var displayForecast = function(forecastObject) {
         dayWindEl.setAttribute("id", `dayWindEl${(i+1)}`);
         var dayHumidityEl = document.createElement("p");
         dayHumidityEl.setAttribute("id", `dayHumidityEl${(i+1)}`);
-
+        //create new variables for the forecast data to be displayed in each card, pulling their values from the corresponding arrays
         var dayDate = forecastObject.formattedDateArr[i];
         var dayIcon = forecastObject.iconArr[i];
         var dayTemp = forecastObject.tempArr[i];
         var dayWind = forecastObject.windArr[i];
         var dayHumidity = forecastObject.humidityArr[i];
 
-        dayDateEl.textContent = dayDate.slice(0, -12);
-        dayIconEl.setAttribute("src", "https://openweathermap.org/img/wn/" + dayIcon + "@2x.png");        
+        dayDateEl.textContent = dayDate.slice(0, -12); //remove additional timestamp from date value
+        dayIconEl.setAttribute("src", "https://openweathermap.org/img/wn/" + dayIcon + "@2x.png"); 
         dayTempEl.textContent = "Temp: " + dayTemp + "ºF";
         dayWindEl.textContent = "Wind: " + dayWind + "MPH";
         dayHumidityEl.textContent = "Humidity: " + dayHumidity + "%";
+        //append all new elements to the dayCard container
         dayCard.appendChild(dayDateEl);
         dayCard.appendChild(dayIconEl);
         dayCard.appendChild(dayTempEl);
         dayCard.appendChild(dayWindEl);
         dayCard.appendChild(dayHumidityEl);
-
-        // dayCard.textContent = "Temp: " + dayTemp;
-    }
-}
-
-searchFormEl.addEventListener("submit", formSubmitHandler);
-// historyButtonEl.addEventListener("click", historyClickHandler);
-var buttonClickHandler = function(event) {
-    var buttonClicked = event.target.getAttribute("id")
-    console.log(buttonClicked);
-    var cityName = buttonClicked.split(",")[0];
-    var stateId = buttonClicked.split(",")[1];
-    forecastContainer.textContent="";
-    console.log(cityName, stateId);
-    getCoordinates(cityName, stateId);
+    };
 };
 
-loadHistory();
+searchFormEl.addEventListener("submit", formSubmitHandler); //event listener for initial search button
 
-searchFormEl.addEventListener("submit", formSubmitHandler);
-cityButtonsEl.addEventListener("click", buttonClickHandler)
+var buttonClickHandler = function(event) { //function called by event listener for search history buttons
+    var buttonClicked = event.target.getAttribute("id") //pull the iD from the button clicked (in format of city,ST)
+    var cityName = buttonClicked.split(",")[0]; //split at comma, assign first value of array to cityName
+    var stateId = buttonClicked.split(",")[1]; //assign 2nd value to stateID
+    forecastContainer.textContent=""; 
+    getCoordinates(cityName, stateId); //pass new search parameters back to getCoordinates function to repeat search
+};
+
+loadHistory(); //call function to load search history from local storage
+
+cityButtonsEl.addEventListener("click", buttonClickHandler) //eventListener for search history buttons
