@@ -26,7 +26,7 @@ var formSubmitHandler = function(event) {
     event.preventDefault();
     forecastContainer.textContent="";
     var cityInput = cityInputEl.value.trim( ).toLowerCase();
-    if (cityInput) { //verify that any input was entered
+    if (cityInput.includes(',')) { //verify that any input was entered
         console.log("A search has been initialized for the city of: " + cityInput);
         cityInputEl.value = ""; //reset input form
         var cityArr = cityInput.split(","); //split input text by comma to separate city name and state abbreviation
@@ -84,7 +84,7 @@ var updateSearchHistory = function(cityName, stateId) {
     searchBtnEl.textContent = (cityName + ", " + stateId);
     var searchBtnElId = cityName.concat(",",stateId);
     // searchBtnEl.setAttribute = ("id", "test");
-    searchBtnEl.setAttribute = ("id", searchBtnElId);
+    searchBtnEl.setAttribute("id", searchBtnElId);
     // searchBtnEl.setAttribute = ("id", `${searchBtnElId}`);
     // searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); //need help here, ID not setting
     cityButtonsEl.appendChild(searchBtnEl);
@@ -101,7 +101,7 @@ var loadHistory = function() {
             $(searchBtnEl).addClass("btn");
             var searchBtnElId = cityName.concat(",",stateId);
             searchBtnEl.textContent = (cityName + ", " + stateId);
-            searchBtnEl.setAttribute = ("id", searchBtnElId);
+            searchBtnEl.setAttribute("id", searchBtnElId);
 
             // searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); 
 
