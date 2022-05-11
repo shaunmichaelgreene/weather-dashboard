@@ -19,6 +19,8 @@ var uvIconEl = document.querySelector("#current-uv-icon");
 var tempEl = document.querySelector("#current-temperature");
 var windEl = document.querySelector("#current-windspeed");
 var unixDateArray = [];
+var formattedDateArray = [];
+var forecastContainer = document.querySelector("#forecast-container");
 
 var formSubmitHandler = function(event) {
     event.preventDefault();
@@ -102,7 +104,7 @@ var getWeather = function(cityLat, cityLon) {
     fetch(apiUrl)
         .then(function(response) {
             if(response.ok) {
-                console.log(response);
+                // console.log(response);
                 response.json().then(function(data) {
                     // console.log(data);
                     displayCurrentWeather(data);
@@ -155,10 +157,10 @@ var getForecast = function(cityLat, cityLon) {
     fetch(apiUrl)
         .then(function(response) {
             if(response.ok) {
-                console.log(response);
+                // console.log(response);
                 response.json().then(function(data) {
                     console.log(data);
-                    displayForecast(data);
+                    interpretForecast(data);
 
                 });                
             } else {
@@ -170,7 +172,7 @@ var getForecast = function(cityLat, cityLon) {
         });
 };
 
-var displayForecast = function(data) {
+var interpretForecast = function(data) {
     var forecastObject = {
         // unixDateArr: [],
         formattedDateArr: [],
@@ -193,21 +195,69 @@ var displayForecast = function(data) {
     // console.log(unixDateArray);
 
     // unixDateArray = forecastObject.unixDateArr;
-    forecastObject.formattedDateArr = dateConverter(unixDateArray);
+    dateConverter(unixDateArray);
+    forecastObject.formattedDateArr = formattedDateArray;
     console.log(forecastObject);
     //now to append everything to the page
+    displayForecast(forecastObject);
 };
 
-var dateConverter = function (formattedDateArr) {
+var dateConverter = function () {
     console.log(unixDateArray); //why is this now undefined?
     for (i=0; i < 5; i++) {
         var toMilliseconds = parseInt(unixDateArray[i]) * 1000;
         var dateObject = new Date (toMilliseconds);
-        var formattedDate = dateObject.toLocaleString('en-us')
-        formattedDateArr.push(formattedDate);
+        var formattedDate = dateObject.toLocaleString('en-us') //.split(",")[0] here?
+        formattedDateArray.push(formattedDate);
     }
-    console.log(formattedDateArr);
+    console.log(formattedDateArray);
     return
 };
 
+var displayForecast = function(forecastObject) {
+    // var dayCard1 = document.createElement("div");
+    // var dayCard2 = document.createElement("div");
+    // var dayCard3 = document.createElement("div");
+    // var dayCard4 = document.createElement("div");
+    // var dayCard5 = document.createElement("div");
+    for (var i=0; i < 5; i++) {
+        var dayCard = document.createElement("div");
+        dayCard.setAttribute("id", `dayCard${(i+1)}`);
+        dayCard.classList = ("card forecast");
+        forecastContainer.appendChild(dayCard);
+        var dayDateEl = document.createElement("p");
+        dayDateEl.setAttribute("id", `dayDateEl${(i+1)}`);
+        var dayIconEl = document.createElement("img");
+        dayIconEl.setAttribute("id", `dayIconEl${(i+1)}`);
+        var dayTempEl = document.createElement("p");
+        dayTempEl.setAttribute("id", `dayTempEl${(i+1)}`);
+        var dayWindEl = document.createElement("p");
+        dayWindEl.setAttribute("id", `dayWindEl${(i+1)}`);
+        var dayHumidityEl = document.createElement("p");
+        dayHumidityEl.setAttribute("id", `dayHumidityEl${(i+1)}`);
+
+        var dayDate = forecastObject.formattedDateArr[i];
+        var dayIcon = forecastObject.iconArr[i];
+        var dayTemp = forecastObject.tempArr[i];
+        var dayWind = forecastObject.windArr[i];
+        var dayHumidity = forecastObject.humidityArr[i];
+
+        dayDateEl.textContent = dayDate.slice(0, -12);
+        dayIconEl.setAttribute("src", "https://openweathermap.org/img/wn/" + dayIcon + "@2x.png");        
+        dayTempEl.textContent = "Temp: " + dayTemp + "ºF";
+        dayWindEl.textContent = "Wind: " + dayWind + "MPH";
+        dayHumidityEl.textContent = "Humidity: " + dayHumidity + "%";
+        dayCard.appendChild(dayDateEl);
+        dayCard.appendChild(dayIconEl);
+        dayCard.appendChild(dayTempEl);
+        dayCard.appendChild(dayWindEl);
+        dayCard.appendChild(dayHumidityEl);
+
+        // dayCard.textContent = "Temp: " + dayTemp;
+    }
+}
+
 searchFormEl.addEventListener("submit", formSubmitHandler);
+
+// var conditionsIcon = document.createElement("img");
+//     conditionsIcon.setAttribute("src", "https://openweathermap.org/img/wn/" + currentWeather.icon + "@2x.png");
