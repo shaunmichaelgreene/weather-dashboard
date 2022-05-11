@@ -516,7 +516,8 @@
     flex-direction: row;
   }
 
-  .forecast { 
+  .forecast {
     color: var(--secondary);
     background-color: var(--dark);
+    text-align: center;
   }
