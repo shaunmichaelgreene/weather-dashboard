@@ -3,7 +3,7 @@
 // 2. gets you lattitude/longitude 
 
 var searchBtn = document.querySelector("#search-btn");
-
+var searchHistory = [];
 var searchFormEl = document.querySelector("#search-form");
 var cityInputEl = document.querySelector("#city");
 var cityContainerEl = document.querySelector("#city-container")
@@ -51,8 +51,9 @@ var formSubmitHandler = function(event) {
             };
         }
         if (found = true) { //if invalid, trigger user alert to re-enter
-            //now have cityName and stateID separated, ready to obtain coordinates and fetch weatherAPI
+            //now have cityName and stateId separated, ready to obtain coordinates and fetch weatherAPI
             // console.log(cityName + ", " + stateId);
+            updateSearchHistory(cityName, stateId);
             getCoordinates(cityName, stateId);
         } else {
             alert("Please re-enter your search term in City, ST format (Ex:'Phoenix, AZ'");
@@ -65,6 +66,42 @@ var formSubmitHandler = function(event) {
         alert("Please re-enter your search term in City, ST format (Ex:'Phoenix, AZ'");
         cityInputEl.value = ""; //reset input form
     }
+};
+
+var updateSearchHistory = function(cityName, stateId) {
+    var newSearch = {
+        city: cityName,
+        state: stateId
+    };
+    if (Array.isArray(newSearch)) {
+        console.log(newSearch);
+    }
+    searchHistory.push(newSearch);
+    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+    var searchBtnEl = document.createElement("button");
+    $(searchBtnEl).addClass("btn");
+    searchBtnEl.textContent = (cityName + ", " + stateId);
+    searchBtnEl.setAttribute = ("data-city", cityName); 
+    searchBtnEl.setAttribute = ("data-state", stateId);
+    cityButtonsEl.appendChild(searchBtnEl);
+};
+
+var loadHistory = function() {
+    searchHistory = JSON.parse(localStorage.getItem("searchHistory"));
+    if (!searchHistory) {
+        searchHistory = [];
+    } else {
+        $.each(searchHistory, function (e) {
+            var cityName = $(this).attr("city");
+            var stateId = $(this).attr("state");
+            var searchBtnEl = document.createElement("button");
+            $(searchBtnEl).addClass("btn");
+            searchBtnEl.textContent = (cityName + ", " + stateId);
+            searchBtnEl.setAttribute = ("data-city", cityName); 
+            searchBtnEl.setAttribute = ("data-state", stateId);
+            cityButtonsEl.appendChild(searchBtnEl);
+        });
+    };
 };
 
 var getCoordinates = function(cityName, stateId) {   
@@ -258,6 +295,7 @@ var displayForecast = function(forecastObject) {
 }
 
 searchFormEl.addEventListener("submit", formSubmitHandler);
+loadHistory();
 
 // var conditionsIcon = document.createElement("img");
 //     conditionsIcon.setAttribute("src", "https://openweathermap.org/img/wn/" + currentWeather.icon + "@2x.png");
