@@ -43,11 +43,12 @@
       <div class="card">
         <h3 class="card-header text-uppercase">Search History</h3>
         <div class="card-body" id="city-buttons">
-          <button class="btn" data-city="pittsburgh" data-state="PA">pittsburgh, PA</button>
+          <button class="btn" id="pittsburgh,PA">pittsburgh, PA</button>
         </div>
       </div>
     </div>
 
+    
     <div class="col-12 col-md-8 border border-dark">
       <h2 class="subtitle">Showing Current Weather For: <span id="city-search-term"></span></h2>
       <div id="city-container" class="list-group">
@@ -59,15 +60,15 @@
           <li id="" class="">Wind Speed: <span id="current-windspeed"></span></li>
         </ul>
       </div>
+
+      <div id="forecast" class="col-12 col-md-8 border border-dark">
+          <h2 class="subtitle col-12 col-md-8">5-Day Forecast: <span id="city-search-term"></span></h2>
+          <div id="forecast-container" class="list-group">
+          </div>
+        </div>
     </div>
     
     
-      <div class="col-12 col-md-8 border border-dark">
-          <h2 class="subtitle">5-Day Forecast: <span id="city-search-term"></span></h2>
-          <div id="forecast-container" class="list-group">
-    
-          </div>
-        </div>
 
   </main>
   <script src="https://kit.fontawesome.com/6eae338ef5.js" crossorigin="anonymous"></script>
@@ -75,4 +76,4 @@
   <script src="./assets/js/script.js"></script>
 </body>
 
-</html>
+</html>>

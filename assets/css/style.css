@@ -521,3 +521,7 @@
     background-color: var(--dark);
     text-align: center;
   }
+
+  #forecast {
+    position: absolute;
+  }
