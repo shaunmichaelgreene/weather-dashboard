@@ -515,3 +515,8 @@
     justify-content: space-around;
     flex-direction: row;
   }
+
+  .forecast { 
+    color: var(--secondary);
+    background-color: var(--dark);
+  }

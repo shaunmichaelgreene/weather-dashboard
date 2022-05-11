@@ -258,6 +258,8 @@ var displayForecast = function(forecastObject) {
 }
 
 searchFormEl.addEventListener("submit", formSubmitHandler);
+// historyButtonEl.addEventListener("click", historyClickHandler);
+
 
 // var conditionsIcon = document.createElement("img");
 //     conditionsIcon.setAttribute("src", "https://openweathermap.org/img/wn/" + currentWeather.icon + "@2x.png");
