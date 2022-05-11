@@ -24,6 +24,7 @@ var forecastContainer = document.querySelector("#forecast-container");
 
 var formSubmitHandler = function(event) {
     event.preventDefault();
+    forecastContainer.textContent="";
     var cityInput = cityInputEl.value.trim( ).toLowerCase();
     if (cityInput) { //verify that any input was entered
         console.log("A search has been initialized for the city of: " + cityInput);
@@ -81,11 +82,9 @@ var updateSearchHistory = function(cityName, stateId) {
     var searchBtnEl = document.createElement("button");
     $(searchBtnEl).addClass("btn");
     searchBtnEl.textContent = (cityName + ", " + stateId);
-    searchBtnEl.setAttribute = ("data-city", cityName); 
-    searchBtnEl.setAttribute = ("data-state", stateId);
+    searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); //need help here, ID not setting
     cityButtonsEl.appendChild(searchBtnEl);
 };
-
 var loadHistory = function() {
     searchHistory = JSON.parse(localStorage.getItem("searchHistory"));
     if (!searchHistory) {
@@ -97,8 +96,8 @@ var loadHistory = function() {
             var searchBtnEl = document.createElement("button");
             $(searchBtnEl).addClass("btn");
             searchBtnEl.textContent = (cityName + ", " + stateId);
-            searchBtnEl.setAttribute = ("data-city", cityName); 
-            searchBtnEl.setAttribute = ("data-state", stateId);
+            searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); 
+
             cityButtonsEl.appendChild(searchBtnEl);
         });
     };
@@ -107,8 +106,6 @@ var loadHistory = function() {
 var getCoordinates = function(cityName, stateId) {   
     var apiKey = "769cf24c651333f06b49474b8dc504e4";
     var apiUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + cityName + "," + stateId + ",USA&appid=" + apiKey;
-
-    // var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "," + stateId + "&appid=" + apiKey; //this is the call for city/state/county search
     
     fetch(apiUrl)
         .then(function(response) {
@@ -188,6 +185,7 @@ var displayCurrentWeather = function(data) {
 }
 
 var getForecast = function(cityLat, cityLon) {
+    formattedDateArray = [];
     var apiKey = "769cf24c651333f06b49474b8dc504e4";
     var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLon + "&exclude=minutely,hourly,alerts&units=imperial&appid=" + apiKey;
     
@@ -294,8 +292,17 @@ var displayForecast = function(forecastObject) {
     }
 }
 
-searchFormEl.addEventListener("submit", formSubmitHandler);
+var buttonClickHandler = function(event) {
+    var buttonClicked = event.target.getAttribute("id")
+    console.log(buttonClicked);
+    var cityName = buttonClicked.split(",")[0];
+    var stateId = buttonClicked.split(",")[1];
+    forecastContainer.textContent="";
+    console.log(cityName, stateId);
+    getCoordinates(cityName, stateId);
+};
+
 loadHistory();
 
-// var conditionsIcon = document.createElement("img");
-//     conditionsIcon.setAttribute("src", "https://openweathermap.org/img/wn/" + currentWeather.icon + "@2x.png");
+searchFormEl.addEventListener("submit", formSubmitHandler);
+cityButtonsEl.addEventListener("click", buttonClickHandler)
