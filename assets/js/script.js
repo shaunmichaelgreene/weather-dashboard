@@ -82,7 +82,11 @@ var updateSearchHistory = function(cityName, stateId) {
     var searchBtnEl = document.createElement("button");
     $(searchBtnEl).addClass("btn");
     searchBtnEl.textContent = (cityName + ", " + stateId);
-    searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); //need help here, ID not setting
+    var searchBtnElId = cityName.concat(",",stateId);
+    // searchBtnEl.setAttribute = ("id", "test");
+    searchBtnEl.setAttribute = ("id", searchBtnElId);
+    // searchBtnEl.setAttribute = ("id", `${searchBtnElId}`);
+    // searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); //need help here, ID not setting
     cityButtonsEl.appendChild(searchBtnEl);
 };
 var loadHistory = function() {
@@ -95,8 +99,12 @@ var loadHistory = function() {
             var stateId = $(this).attr("state");
             var searchBtnEl = document.createElement("button");
             $(searchBtnEl).addClass("btn");
+            var searchBtnElId = cityName.concat(",",stateId);
             searchBtnEl.textContent = (cityName + ", " + stateId);
-            searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); 
+            searchBtnEl.setAttribute = ("id", searchBtnElId);
+
+            // searchBtnEl.setAttribute = ("id", `${cityName},${stateId}`); 
+
 
             cityButtonsEl.appendChild(searchBtnEl);
         });
@@ -208,6 +216,7 @@ var getForecast = function(cityLat, cityLon) {
 };
 
 var interpretForecast = function(data) {
+    unixDateArray = [];
     var forecastObject = {
         // unixDateArr: [],
         formattedDateArr: [],
